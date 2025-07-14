@@ -1,32 +1,59 @@
 import dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
 
 interface EnvConfig {
-    PORT: string,
-    DB_URL: string,
-    NODE_ENV: "development" | "production",
-    SUPER_ADMIN_PASSWORD:string,
-    SUPER_ADMIN_EMAIL:string
+  PORT: string;
+  DB_URL: string;
+  NODE_ENV: "development" | "production";
+  SUPER_ADMIN_PASSWORD: string;
+  SUPER_ADMIN_EMAIL: string;
+  JWT_REFRESH_SECRET: string;
+  JWT_REFRESS_EXPIRES: string;
+  FRONTEND_URL: string;
+  EXPRESS_SESSION_SECRET: string;
+  GOOGLE_CALLBACK_URL: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
 }
 
 const loadEnvVariables = (): EnvConfig => {
-    const requiredEnvVariables: string[] = ["PORT", "DB_URL", "NODE_ENV" ,"SUPER_ADMIN_PASSWORD","SUPER_ADMIN_EMAIL"];
+  const requiredEnvVariables: string[] = [
+    "PORT",
+    "DB_URL",
+    "NODE_ENV",
+    "SUPER_ADMIN_PASSWORD",
+    "SUPER_ADMIN_EMAIL",
+    "JWT_REFRESH_SECRET",
+    "JWT_REFRESS_EXPIRES",
+    "FRONTEND_URL",
+    "EXPRESS_SESSION_SECRET",
+    "GOOGLE_CALLBACK_URL",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+  ];
 
-    requiredEnvVariables.forEach(key => {
-        if (!process.env[key]) {
-            throw new Error(`Missing require environment variabl ${key}`)
-        }
-    })
-
-    return {
-        PORT: process.env.PORT as string,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        DB_URL: process.env.DB_URL!,
-        NODE_ENV: process.env.NODE_ENV as "development" | "production",
-        SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD as string,
-        SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string
+  requiredEnvVariables.forEach((key) => {
+    if (!process.env[key]) {
+      throw new Error(`Missing require environment variabl ${key}`);
     }
-}
+  });
 
-export const envVars = loadEnvVariables()
+  return {
+    PORT: process.env.PORT as string,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    DB_URL: process.env.DB_URL!,
+    NODE_ENV: process.env.NODE_ENV as "development" | "production",
+    SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD as string,
+    SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string,
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
+    JWT_REFRESS_EXPIRES: process.env.JWT_REFRESS_EXPIRES as string,
+    FRONTEND_URL: process.env.FRONTEND_URL as string,
+    EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
+    GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
+  };
+};
+
+export const envVars = loadEnvVariables();

@@ -1,8 +1,11 @@
-import { generateToken } from "../../../utils/jwt";
+import { IsActive } from "./../user/user.interface";
+import { JwtPayload } from "jsonwebtoken";
+import { generateToken, verifyToken } from "../../../utils/jwt";
+import { createNewAccessTokenByRefreshToken, createToken } from "../../../utils/userTokens";
+import { envVars } from "../../config/env";
 import { IUser } from "../user/user.interface";
 import { User } from "../user/user.model";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 
 const creadentialsLogin = async (payload: Partial<IUser>) => {
   const { email, password } = payload;
@@ -25,17 +28,43 @@ const creadentialsLogin = async (payload: Partial<IUser>) => {
   const userWithoutPassword = isUserExist.toObject();
   delete userWithoutPassword.password;
 
-  const jwtPayload = {
-    userId: userWithoutPassword._id,
-    email: userWithoutPassword.email,
-    role: userWithoutPassword.role,
-  };
+  const Tokendata = createToken(userWithoutPassword);
 
-  const accessToken = generateToken(jwtPayload, "yeasin", "1d");
-
-  return { accessToken, userWithoutPassword };
+  return { ...Tokendata, user: userWithoutPassword };
 };
+
+const getNewAccessToken = async (refreshToken: string) => {
+  const accessToken = await createNewAccessTokenByRefreshToken(refreshToken);
+
+  return { ...accessToken };
+};
+
+const resetPassword = async (decoded: JwtPayload, newPassword: string, oldPassword: string) => {
+  const isUserExist = await User.findOne({ email: decoded.email });
+
+  if (!isUserExist) {
+    throw new Error("User Not Found");
+  }
+
+  const isPasswordMatched = await bcrypt.compare(
+    oldPassword,
+    isUserExist?.password as string
+  );
+
+  if (!isPasswordMatched) {
+    throw new Error("Old Password Not Matched");
+  }
+
+  const hashPassword = await bcrypt.hash(newPassword, 10);
+
+  isUserExist.password = hashPassword;
+
+  await isUserExist.save();
+
+}
 
 export const authServices = {
   creadentialsLogin,
+  getNewAccessToken,
+  resetPassword
 };
