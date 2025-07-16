@@ -4,19 +4,32 @@ import { sendResponse } from "../../../utils/sendResponse"
 import { createToken } from "../../../utils/userTokens"
 import { envVars } from "../../config/env"
 import { JwtPayload } from "jsonwebtoken"
+import passport from "passport"
 
 const creadentialsLogin = async (req:Request,res:Response,next:NextFunction) =>{
     try {
-        const loginInfo = await authServices.creadentialsLogin(req.body)
+        passport.authenticate("local", async( err:any, user:any, info:any)=>{
+            console.log(err)
+            if(err){
+                return next(err?.message)
+            }
+            if(!user){
+                return next(new Error(info.message))
+            }
 
-        res.cookie("accessToken",loginInfo.accessToken,
-            {httpOnly:true,secure:false}
-        )
-        res.cookie("refreshToken",loginInfo.refreshToken,
-            {httpOnly:true,secure:false}
-        )
+            const jwtpayload = {userId:user._id,email:user.email,role:user.role}
+            const tokenInfo = createToken(jwtpayload)
+            res.cookie("accessToken",tokenInfo.accessToken,
+                {httpOnly:true,secure:false}
+            )
+            res.cookie("refreshToken",tokenInfo.refreshToken,
+                {httpOnly:true,secure:false}
+            )
 
-        sendResponse(res,200,"Login Successfully",loginInfo)
+            const {password,...rest} = user.toObject()
+
+            sendResponse(res,200,"Login Successfully",{...tokenInfo,user:rest})
+        })(req,res,next)
     } catch (error) {
         next(error)
     }

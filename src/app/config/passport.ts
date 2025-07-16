@@ -4,9 +4,48 @@ import {
   Profile,
   VerifyCallback,
 } from "passport-google-oauth20";
+import { Strategy as LocalStrategy } from "passport-local";
 import { envVars } from "./env";
 import { User } from "../modules/user/user.model";
 import { Role } from "../modules/user/user.interface";
+import bcrypt from "bcryptjs";
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+    },
+    async (email: string, password: string, done) => {
+      try {
+        const user = await User.findOne({ email });
+        if (!user) {
+          return done(null, false, { message: "User not found" });
+        }
+
+        const isGoogleAuth = user.auths?.some((auth) => auth.provider === "google");
+
+        if (isGoogleAuth && !user.password) {
+          return done(null, false, { message: "Login with Google" });
+        }
+
+        const isPasswordMatched = await bcrypt.compare(
+          password,
+          user.password as string
+        );
+
+        if (!isPasswordMatched) {
+          return done(null, false, { message: "Invalid Password" });
+        }
+
+        return done(null, user);
+      } catch (error) {
+        console.log(error);
+        return done(error);
+      }
+    }
+  )
+);
 
 passport.use(
   new GoogleStrategy(
@@ -49,9 +88,8 @@ passport.use(
   )
 );
 
-passport.serializeUser(
-  (user: any, done: (err: any, id?: unknown) => void) =>
-    done(null, user._id)
+passport.serializeUser((user: any, done: (err: any, id?: unknown) => void) =>
+  done(null, user._id)
 );
 
 passport.deserializeUser(

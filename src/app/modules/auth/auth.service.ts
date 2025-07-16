@@ -7,31 +7,31 @@ import { IUser } from "../user/user.interface";
 import { User } from "../user/user.model";
 import bcrypt from "bcryptjs";
 
-const creadentialsLogin = async (payload: Partial<IUser>) => {
-  const { email, password } = payload;
+// const creadentialsLogin = async (payload: Partial<IUser>) => {
+//   const { email, password } = payload;
 
-  const isUserExist = await User.findOne({ email });
+//   const isUserExist = await User.findOne({ email });
 
-  if (!isUserExist) {
-    throw new Error("User Not Found");
-  }
+//   if (!isUserExist) {
+//     throw new Error("User Not Found");
+//   }
 
-  const isPasswordMatched = await bcrypt.compare(
-    password as string,
-    isUserExist?.password as string
-  );
+//   const isPasswordMatched = await bcrypt.compare(
+//     password as string,
+//     isUserExist?.password as string
+//   );
 
-  if (!isPasswordMatched) {
-    throw new Error("Invalid Password");
-  }
+//   if (!isPasswordMatched) {
+//     throw new Error("Invalid Password");
+//   }
 
-  const userWithoutPassword = isUserExist.toObject();
-  delete userWithoutPassword.password;
+//   const userWithoutPassword = isUserExist.toObject();
+//   delete userWithoutPassword.password;
 
-  const Tokendata = createToken(userWithoutPassword);
+//   const Tokendata = createToken(userWithoutPassword);
 
-  return { ...Tokendata, user: userWithoutPassword };
-};
+//   return { ...Tokendata, user: userWithoutPassword };
+// };
 
 const getNewAccessToken = async (refreshToken: string) => {
   const accessToken = await createNewAccessTokenByRefreshToken(refreshToken);
@@ -64,7 +64,7 @@ const resetPassword = async (decoded: JwtPayload, newPassword: string, oldPasswo
 }
 
 export const authServices = {
-  creadentialsLogin,
+  // creadentialsLogin,
   getNewAccessToken,
   resetPassword
 };
