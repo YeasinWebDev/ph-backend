@@ -20,7 +20,7 @@ const divisionSchema = new mongoose.Schema<IDivision>(
       type: String,
     },
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 export const Division = mongoose.model<IDivision>("Division", divisionSchema);

@@ -11,6 +11,7 @@ const tourTypeSchema = new mongoose.Schema<ITourType>(
   },
   {
     timestamps: true,
+    versionKey: false,
   }
 );
 
@@ -77,6 +78,9 @@ const tourSchema = new mongoose.Schema<ITour>({
     ref: "TourType",
     required: true,
   },
+},{
+  timestamps: true,
+  versionKey: false
 });
 
 export const Tour = mongoose.model<ITour>("Tour", tourSchema);
