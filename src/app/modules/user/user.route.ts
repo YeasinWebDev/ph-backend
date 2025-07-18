@@ -18,6 +18,13 @@ UserRouters.get(
   checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
   userController.getAllUsers
 );
+
+UserRouters.get(
+  '/:id',
+  checkAuth(...Object.values(Role)),
+  userController.getUser
+)
+
 UserRouters.patch(
   "/:id",
   checkAuth(...Object.values(Role)),

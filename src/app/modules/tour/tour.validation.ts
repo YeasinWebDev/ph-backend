@@ -25,7 +25,6 @@ const objectIdSchema = z.string().refine((val) => Types.ObjectId.isValid(val), {
 
 export const createTourSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  slug: z.string().min(1, "Slug is required"),
   images: z.array(z.string().url()).optional(),
   description: z.string().optional(),
   location: z.string().optional(),
@@ -40,6 +39,8 @@ export const createTourSchema = z.object({
   minAge: z.number().int().nonnegative().optional(),
   division: objectIdSchema,
   tourType: objectIdSchema,
+  departureLocation: z.string().optional(),
+  arrivalLocation: z.string().optional(),
 });
 
 
@@ -60,4 +61,6 @@ export const updateTourSchema = z.object({
   minAge: z.number().int().nonnegative().optional(),
   division: objectIdSchema.optional(),
   tourType: objectIdSchema.optional(),
+  departureLocation: z.string().optional(),
+  arrivalLocation: z.string().optional(),
 });

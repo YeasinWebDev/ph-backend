@@ -10,7 +10,6 @@ const divisionSchema = new mongoose.Schema<IDivision>(
     },
     slug: {
       type: String,
-      required: true,
       unique: true,
     },
     thumbnail: {
@@ -22,5 +21,19 @@ const divisionSchema = new mongoose.Schema<IDivision>(
   },
   { timestamps: true, versionKey: false }
 );
+
+divisionSchema.pre("save", function (next) {
+  if(!this.isModified("name")) return next();
+  this.slug = this.name.toLowerCase().split(" ").join("-") + "-" + "division";
+  next();
+});
+
+divisionSchema.pre("findOneAndUpdate", async function (next) {
+  const update = this.getUpdate() as Partial<IDivision>; ;
+  if(!update.name) return next();
+  update.slug = update.name.toLowerCase().split(" ").join("-") + "-" + "division";
+  this.setUpdate(update);
+  next();
+});
 
 export const Division = mongoose.model<IDivision>("Division", divisionSchema);

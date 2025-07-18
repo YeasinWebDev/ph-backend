@@ -24,7 +24,6 @@ const tourSchema = new mongoose.Schema<ITour>({
   },
   slug: {
     type: String,
-    required: true,
     unique: true,
   },
   images: {
@@ -78,9 +77,30 @@ const tourSchema = new mongoose.Schema<ITour>({
     ref: "TourType",
     required: true,
   },
+  departureLocation: {
+    type: String,
+  },
+  arrivalLocation: {
+    type: String,
+  },
 },{
   timestamps: true,
   versionKey: false
+});
+
+
+tourSchema.pre("save", function (next) {
+  if(!this.isModified("name")) return next();
+  this.slug = this.name.toLowerCase().split(" ").join("-") ;
+  next();
+});
+
+tourSchema.pre("findOneAndUpdate", async function (next) {
+  const update = this.getUpdate() as Partial<ITour>; ;
+  if(!update.name) return next();
+  update.slug = update.name.toLowerCase().split(" ").join("-");
+  this.setUpdate(update);
+  next();
 });
 
 export const Tour = mongoose.model<ITour>("Tour", tourSchema);

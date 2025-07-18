@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { Division } from "./division.model";
 import AppError from "../../errorHelpers/AppError";
 import { sendResponse } from "../../../utils/sendResponse";
+import { QueryBuilder } from "../../../utils/QueryBuilder";
 
 const createDevision = async (
   req: Request,
@@ -15,8 +16,7 @@ const createDevision = async (
     if (isExist) {
       throw new AppError("Division already exist", 400);
     }
-    let slug = data.name.toLowerCase() + "-" + "division";
-    const result = await Division.create({ ...data, slug });
+    const result = await Division.create({ ...data});
 
     sendResponse(res, 200, "Division created successfully", result);
   } catch (error) {
@@ -24,13 +24,42 @@ const createDevision = async (
   }
 };
 
+
 const getAllDevision = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const result = await Division.find({});
+
+    const quaryBuilder = new QueryBuilder(Division.find(), req.query);
+    const divisions = await quaryBuilder
+      .search([])
+      .filter()
+      .sort()
+      .fields()
+      .pagination()
+      .getResults();
+
+    const meta = await quaryBuilder.getMeta();
+
+    sendResponse(res, 200, "Division fetched successfully", {
+      meta,
+      divisions
+    })
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getSingleDevision = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const slug = req.params.slug;
+    const result = await Division.findOne({ slug });
     sendResponse(res, 200, "Division fetched successfully", result);
   } catch (error) {
     next(error);
@@ -49,12 +78,17 @@ const updateDevision = async (
     if (!findDivision) {
       throw new AppError("Division not found", 400);
     }
-    if (data?.name) {
-      data.slug = data.name.toLowerCase() + "-" + "division";
+
+    const isExist = await Division.findOne({
+      name: data.name,
+      _id: { $ne: divisionId },
+    });
+    if (isExist) {
+      throw new AppError("Division already exist", 400);
     }
 
     const result = await Division.findByIdAndUpdate(divisionId, data, {
-      new: true,
+      new: true, runValidators: true,
     });
     sendResponse(res, 200, "Division updated successfully", result);
   } catch (error) {
@@ -85,4 +119,5 @@ export const DivisionService = {
   getAllDevision,
   updateDevision,
   deleteDivision,
+  getSingleDevision
 };

@@ -55,6 +55,12 @@ tourRouter.patch(
   TourController.updateTour
 );
 
+tourRouter.get(
+  "/:slug",
+  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
+  TourController.getSingleTour
+);
+
 tourRouter.delete(
   "/:id",
   checkAuth(Role.SUPER_ADMIN, Role.ADMIN),

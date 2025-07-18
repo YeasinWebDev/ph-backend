@@ -3,6 +3,8 @@ import { NextFunction, Request, Response } from "express";
 import { Tour, TourType } from "./tour.model";
 import AppError from "../../errorHelpers/AppError";
 import { sendResponse } from "../../../utils/sendResponse";
+import { excludeFields, toursearchFields } from "./tour.constant";
+import { QueryBuilder } from "../../../utils/QueryBuilder";
 
 // tourTypes
 const createTourType = async (
@@ -28,8 +30,13 @@ const allToursType = async (
   next: NextFunction
 ) => {
   try {
-    const result = await TourType.find();
-    sendResponse(res, 200, "Tours fetched successfully", result);
+    const query = req.query;
+    const result = await TourType.find(query);
+    const totalToursType = await TourType.countDocuments();
+    sendResponse(res, 200, "Tours fetched successfully", {
+      tourTypes: result,
+      totalToursType,
+    });
   } catch (error) {
     next(error);
   }
@@ -71,6 +78,8 @@ const deleteToursType = async (
 
 const createTour = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const slug = req.body.name.toLowerCase().split(" ").join("-");
+    req.body.slug = slug;
     const result = await Tour.create(req.body);
     sendResponse(res, 200, "Tour created successfully", result);
   } catch (error) {
@@ -78,15 +87,74 @@ const createTour = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+// const allTours = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     const query = req.query;
+//     const sort = req.query.sort || "-createdAt";
+//     const search = req.query.search || "";
+//     const fields =
+//       ((req.query.fields as string) || "").split(",").join(" ") || "";
+//     const page = Number(req.query.page) || 1;
+//     const limit = Number(req.query.limit) || 10;
+//     const skip = (page - 1) * limit;
+
+//     for (const field of excludeFields) {
+//       delete query[field];
+//     }
+
+//     const result = await Tour.find({
+//       $or: toursearchFields.map((field) => ({
+//         [field]: {
+//           $regex: search,
+//           $options: "i",
+//         },
+//       })),
+//     })
+//       .find(query)
+//       .sort(sort as string)
+//       .select(fields)
+//       .populate(["tourType", "division"])
+//       .skip(skip)
+//       .limit(limit);
+
+//     const totalTour = await Tour.countDocuments();
+
+//     const meta ={
+//       total: totalTour,
+//       page,
+//       limit,
+//       totalPages: Math.ceil(totalTour / limit),
+//     }
+//     sendResponse(res, 200, "Tours fetched successfully", {
+//       tours: result,
+//       meta
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 const allTours = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await Tour.find().populate(["tourType", "division"]);
-    sendResponse(res, 200, "Tours fetched successfully", result);
+    const quaryBuilder = new QueryBuilder(Tour.find(), req.query);
+    const tours = await quaryBuilder
+      .search(toursearchFields)
+      .filter()
+      .sort()
+      .fields()
+      .pagination()
+      .getResults();
+
+    const meta = await quaryBuilder.getMeta();
+
+    sendResponse(res, 200, "Tours fetched successfully", {
+      meta,
+      tours,
+    });
   } catch (error) {
     next(error);
   }
 };
-
 const updateTour = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const tourId = req.params.id;
@@ -106,15 +174,25 @@ const updateTour = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const deleteTour = async(req:Request, res:Response, next:NextFunction)=>{
-   const tourId= req.params.id;
-   try {
+const getSingleTour = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const slug = req.params.slug;
+    const result = await Tour.findOne({ slug });
+    sendResponse(res, 200, "Tour fetched successfully", result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteTour = async (req: Request, res: Response, next: NextFunction) => {
+  const tourId = req.params.id;
+  try {
     const result = await Tour.findByIdAndDelete(tourId);
     sendResponse(res, 200, "Tour deleted successfully", result);
-   } catch (error) {
-    next(error)
-   }
-}
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const TourService = {
   createTourType,
@@ -125,5 +203,6 @@ export const TourService = {
   createTour,
   allTours,
   updateTour,
-  deleteTour
+  deleteTour,
+  getSingleTour,
 };

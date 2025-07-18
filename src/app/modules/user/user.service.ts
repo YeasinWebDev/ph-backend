@@ -83,8 +83,14 @@ const getAllUsers = async () => {
   return allUser;
 };
 
+const getUser = async (userId: string) => {
+  const user = await User.findById(userId);
+  return user;
+};
+
 export const UserService = {
   createUser,
   getAllUsers,
   updateUser,
+  getUser
 };

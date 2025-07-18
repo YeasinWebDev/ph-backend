@@ -17,6 +17,10 @@ const getAllDivision = async (
   await DivisionService.getAllDevision(req, res, next);
 };
 
+const getSingleDivision = async (req: Request, res: Response, next: NextFunction) => {
+  await DivisionService.getSingleDevision(req, res, next);
+};
+
 const updateDivision = async (req: Request, res: Response, next: NextFunction) => {
   await DivisionService.updateDevision(req, res, next);                                                                         
 };
@@ -30,4 +34,5 @@ export const divisionController = {
   getAllDivision,
   updateDivision,
   deleteDivision,
+  getSingleDivision
 };

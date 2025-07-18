@@ -26,6 +26,12 @@ divisionRouter.patch(
   divisionController.updateDivision
 );
 
+divisionRouter.get(
+  "/:slug",
+  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
+  divisionController.getSingleDivision
+);
+
 divisionRouter.delete(
   "/:id",
   checkAuth(Role.SUPER_ADMIN, Role.ADMIN),

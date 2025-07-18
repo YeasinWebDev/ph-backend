@@ -34,8 +34,12 @@ const updateTour = async (req: Request, res: Response, next: NextFunction) => {
     await TourService.updateTour(req, res, next);
 }
 
+const getSingleTour = async (req: Request, res: Response, next: NextFunction) => {
+    await TourService.getSingleTour(req, res, next);
+}
+
 const deleteTour = async (req: Request, res: Response, next: NextFunction) => {
     await TourService.deleteTour(req, res, next);
 }
 
-export const TourController = { createTourType, allToursType , updateToursType, deleteToursType, createTour, allTours, updateTour,deleteTour };
+export const TourController = { createTourType, allToursType , updateToursType, deleteToursType, createTour, allTours, updateTour,deleteTour, getSingleTour };
