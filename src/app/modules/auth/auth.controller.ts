@@ -17,8 +17,8 @@ const creadentialsLogin = async (req:Request,res:Response,next:NextFunction) =>{
                 return next(new Error(info.message))
             }
 
-            const jwtpayload = {userId:user._id,email:user.email,role:user.role}
-            const tokenInfo = createToken(jwtpayload)
+            // const jwtpayload = {userId:user._id,email:user.email,role:user.role}
+            const tokenInfo = createToken(user)
             res.cookie("accessToken",tokenInfo.accessToken,
                 {httpOnly:true,secure:false}
             )

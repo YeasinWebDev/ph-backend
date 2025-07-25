@@ -11,6 +11,8 @@ import "./app/config/passport"
 import { envVars } from "./app/config/env";
 import { divisionRouter } from "./app/modules/division/division.route";
 import { tourRouter } from "./app/modules/tour/tour.route";
+import { bookingRoutes } from "./app/modules/booking/booking.route";
+import { paymentRoute } from "./app/modules/payment/payment.route";
 
 const app = express();
 
@@ -35,6 +37,8 @@ app.use("/api/v1/user", UserRouters);
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/division", divisionRouter)
 app.use('/api/v1/tour', tourRouter)
+app.use("/api/v1/booking", bookingRoutes)
+app.use("/api/v1/payment", paymentRoute)
 app.use(globalErrorHandler);
 
 app.use(notFound)
