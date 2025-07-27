@@ -3,12 +3,9 @@ import { Division } from "./division.model";
 import AppError from "../../errorHelpers/AppError";
 import { sendResponse } from "../../../utils/sendResponse";
 import { QueryBuilder } from "../../../utils/QueryBuilder";
+import { deleteImageFromCloudinary } from "../../config/cloudinary.config";
 
-const createDevision = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const createDevision = async (req: Request, res: Response, next: NextFunction) => {
   const data = req.body;
 
   try {
@@ -16,7 +13,8 @@ const createDevision = async (
     if (isExist) {
       throw new AppError("Division already exist", 400);
     }
-    const result = await Division.create({ ...data});
+    const payload = { ...data, thumbnail: req.file?.path };
+    const result = await Division.create(payload);
 
     sendResponse(res, 200, "Division created successfully", result);
   } catch (error) {
@@ -24,39 +22,23 @@ const createDevision = async (
   }
 };
 
-
-const getAllDevision = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const getAllDevision = async (req: Request, res: Response, next: NextFunction) => {
   try {
-
     const quaryBuilder = new QueryBuilder(Division.find(), req.query);
-    const divisions = await quaryBuilder
-      .search([])
-      .filter()
-      .sort()
-      .fields()
-      .pagination()
-      .getResults();
+    const divisions = await quaryBuilder.search([]).filter().sort().fields().pagination().getResults();
 
     const meta = await quaryBuilder.getMeta();
 
     sendResponse(res, 200, "Division fetched successfully", {
       meta,
-      divisions
-    })
+      divisions,
+    });
   } catch (error) {
     next(error);
   }
 };
 
-const getSingleDevision = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const getSingleDevision = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const slug = req.params.slug;
     const result = await Division.findOne({ slug });
@@ -66,11 +48,7 @@ const getSingleDevision = async (
   }
 };
 
-const updateDevision = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const updateDevision = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const divisionId = req.params.id;
     const data = req.body;
@@ -83,24 +61,27 @@ const updateDevision = async (
       name: data.name,
       _id: { $ne: divisionId },
     });
-    if (isExist) {
-      throw new AppError("Division already exist", 400);
+    if (!isExist) {
+      throw new AppError("Division not exist", 400);
     }
 
-    const result = await Division.findByIdAndUpdate(divisionId, data, {
-      new: true, runValidators: true,
+    const payload = { ...data, thumbnail: req.file?.path };
+
+    const result = await Division.findByIdAndUpdate(divisionId, payload, {
+      new: true,
+      runValidators: true,
     });
+
+    if (req.file?.path && isExist.thumbnail) {
+      await deleteImageFromCloudinary(isExist.thumbnail);
+    }
     sendResponse(res, 200, "Division updated successfully", result);
   } catch (error) {
     next(error);
   }
 };
 
-const deleteDivision = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const deleteDivision = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const divisionId = req.params.id;
     const findDivision = await Division.findById(divisionId);
@@ -119,5 +100,5 @@ export const DivisionService = {
   getAllDevision,
   updateDevision,
   deleteDivision,
-  getSingleDevision
+  getSingleDevision,
 };

@@ -9,7 +9,7 @@ import passport from "passport"
 const creadentialsLogin = async (req:Request,res:Response,next:NextFunction) =>{
     try {
         passport.authenticate("local", async( err:any, user:any, info:any)=>{
-            console.log(err)
+            // console.log(err)
             if(err){
                 return next(err?.message)
             }
@@ -70,20 +70,57 @@ const logout = async (req:Request,res:Response,next:NextFunction) =>{
     }
 }
 
-const resetPassword = async (req:Request,res:Response,next:NextFunction) =>{
+const changePassword = async (req:Request,res:Response,next:NextFunction) =>{
     try {
         const decoded = req.user as JwtPayload
 
         const newPassword = req.body.newPassword
         const oldPassword = req.body.oldPassword
 
-        await authServices.resetPassword(decoded,newPassword, oldPassword)
+        await authServices.changePassword(decoded,newPassword, oldPassword)
         
         sendResponse(res,200,"Reset Password Successfully",{})
     } catch (error) {
         next(error)
     }
 }
+const resetPassword = async (req:Request,res:Response,next:NextFunction) =>{
+    try {
+        const decoded = req.user as JwtPayload
+
+        const {newPassword,id} = req.body
+
+        await authServices.resetPassword(decoded,newPassword,id)
+        
+        sendResponse(res,200,"Reset Password Successfully",{})
+    } catch (error) {
+        next(error)
+    }
+}
+const setPassword = async (req:Request,res:Response,next:NextFunction) =>{
+    try {
+        const decoded = req.user as JwtPayload
+        const password = req.body.password
+
+        await authServices.setPassword(decoded.userId, password)
+        
+        sendResponse(res,200,"Reset Password Successfully",{})
+    } catch (error) {
+        next(error)
+    }
+}
+
+const forgetPassword = async (req:Request,res:Response,next:NextFunction) =>{
+    try {
+        const email = req.body.email
+        await authServices.forgetPassword(email)
+        
+        sendResponse(res,200,"Email sent Successfully",{})
+    } catch (error) {
+        next(error)
+    }
+}
+
 const googleCallback = async (req:Request,res:Response,next:NextFunction) =>{
     let redirecTo = req.query.state ? req.query.state as string : ""
     if(redirecTo){
@@ -110,5 +147,8 @@ export const authControllers = {
     getNewAccessToken,
     logout,
     resetPassword,
-    googleCallback
+    changePassword,
+    googleCallback,
+    setPassword,
+    forgetPassword
 }

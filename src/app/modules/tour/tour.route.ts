@@ -4,6 +4,7 @@ import { checkAuth } from "../../middlewares/checkAuth";
 import { Role } from "../user/user.interface";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { createTourSchema, createTourTypeZodSchema, updateTourSchema, updateTourTypeZodSchema } from "./tour.validation";
+import { malterUpload } from "../../config/multer.config";
 
 export const tourRouter = Router();
 
@@ -38,6 +39,7 @@ tourRouter.delete(
 tourRouter.post(
   "/create",
   checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
+  malterUpload.array("files"),
   validateRequest(createTourSchema),
   TourController.createTour
 );
@@ -51,6 +53,7 @@ tourRouter.get(
 tourRouter.patch(
   "/:id",
   checkAuth(Role.SUPER_ADMIN, Role.ADMIN), 
+  malterUpload.array("files"),
   validateRequest(updateTourSchema),
   TourController.updateTour
 );

@@ -2,8 +2,9 @@ import { JwtPayload } from "jsonwebtoken";
 import { IAuthProvider, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
 import bcrypt from "bcryptjs";
+import { deleteImageFromCloudinary } from "../../config/cloudinary.config";
 
-const createUser = async (payload: Partial<IUser>) => {
+const createUser = async (payload: Partial<IUser>, picture?: string) => {
   const { email, ...rest } = payload;
 
   const isUserExist = await User.findOne({ email });
@@ -22,6 +23,7 @@ const createUser = async (payload: Partial<IUser>) => {
   };
 
   const user = await User.create({
+    picture,
     email,
     auths: [authProbider],
     ...rest,
@@ -30,14 +32,10 @@ const createUser = async (payload: Partial<IUser>) => {
   return user;
 };
 
-const updateUser = async (
-  userId: string,
-  payload: Partial<IUser>,
-  decodedToken: JwtPayload
-) => {
-  const ifUserExist = await User.findById(userId);
+const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken: JwtPayload, picture?: string) => {
+  const isUserExist = await User.findById(userId);
 
-  if (!ifUserExist) {
+  if (!isUserExist) {
     throw new Error("User not found");
   }
 
@@ -50,17 +48,17 @@ const updateUser = async (
    * promoting to superadmin - superadmin
    */
 
-  if (payload.role) {
+  if (isUserExist.role) {
     if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
       throw new Error("You are not authorized");
     }
 
-    if (payload.role === Role.SUPER_ADMIN && decodedToken.role === Role.ADMIN) {
+    if (isUserExist.role === Role.SUPER_ADMIN && decodedToken.role === Role.ADMIN) {
       throw new Error("You are not authorized");
     }
   }
 
-  if (payload.isActive || payload.isDeleted || payload.isVerified) {
+  if (isUserExist.isActive || isUserExist.isDeleted || isUserExist.isVerified) {
     if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
       throw new Error("You are not authorized");
     }
@@ -70,10 +68,18 @@ const updateUser = async (
     payload.password = await bcrypt.hash(payload.password, 10);
   }
 
-  const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, {
-    new: true,
-    runValidators: true,
-  });
+  const newUpdatedUser = await User.findByIdAndUpdate(
+    userId,
+    { ...payload, picture },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if(picture && isUserExist.picture){
+    await deleteImageFromCloudinary(isUserExist.picture);
+  }
 
   return newUpdatedUser;
 };
@@ -88,9 +94,15 @@ const getUser = async (userId: string) => {
   return user;
 };
 
+const getMe = async (decodedToken: JwtPayload) => {
+  const user = await User.findById(decodedToken.userId);
+  return user;
+};
+
 export const UserService = {
   createUser,
   getAllUsers,
   updateUser,
-  getUser
+  getUser,
+  getMe,
 };

@@ -5,13 +5,10 @@ import AppError from "../../errorHelpers/AppError";
 import { sendResponse } from "../../../utils/sendResponse";
 import { excludeFields, toursearchFields } from "./tour.constant";
 import { QueryBuilder } from "../../../utils/QueryBuilder";
+import { deleteImageFromCloudinary } from "../../config/cloudinary.config";
 
 // tourTypes
-const createTourType = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const createTourType = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const isExist = await TourType.findOne({ name: req.body.name });
     if (isExist) {
@@ -24,11 +21,7 @@ const createTourType = async (
   }
 };
 
-const allToursType = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const allToursType = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const query = req.query;
     const result = await TourType.find(query);
@@ -42,11 +35,7 @@ const allToursType = async (
   }
 };
 
-const updateToursType = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const updateToursType = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const isExist = await TourType.findOne({ _id: req.params.id });
     if (!isExist) {
@@ -61,11 +50,7 @@ const updateToursType = async (
   }
 };
 
-const deleteToursType = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const deleteToursType = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await TourType.findByIdAndDelete(req.params.id);
     sendResponse(res, 200, "Tours deleted successfully", result);
@@ -80,7 +65,12 @@ const createTour = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const slug = req.body.name.toLowerCase().split(" ").join("-");
     req.body.slug = slug;
-    const result = await Tour.create(req.body);
+
+    const payload = {
+      ...req.body,
+      images: (req.files as Express.Multer.File[])?.map((file) => file.path),
+    };
+    const result = await Tour.create(payload);
     sendResponse(res, 200, "Tour created successfully", result);
   } catch (error) {
     next(error);
@@ -137,13 +127,7 @@ const createTour = async (req: Request, res: Response, next: NextFunction) => {
 const allTours = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const quaryBuilder = new QueryBuilder(Tour.find(), req.query);
-    const tours = await quaryBuilder
-      .search(toursearchFields)
-      .filter()
-      .sort()
-      .fields()
-      .pagination()
-      .getResults();
+    const tours = await quaryBuilder.search(toursearchFields).filter().sort().fields().pagination().getResults();
 
     const meta = await quaryBuilder.getMeta();
 
@@ -165,9 +149,35 @@ const updateTour = async (req: Request, res: Response, next: NextFunction) => {
       throw new AppError("Tour not exist", 400);
     }
 
-    const result = await Tour.findByIdAndUpdate(tourId, data, {
+    const payload = {
+      ...req.body,
+      images: (req.files as Express.Multer.File[])?.map((file) => file.path),
+    };
+
+    // update images
+    if (payload.image && payload.image.length > 0 && isExist.images && isExist.images.length > 0) {
+      payload.images = [...isExist.images, ...payload.images];
+    }
+    
+    if (payload.deleteImages && payload.deleteImages.length > 0 && isExist.images && isExist.images.length > 0) {
+      const restDbImages = isExist.images.filter((image) => !payload.deleteImages.includes(image));
+
+      const updatedPayloadImages = (payload.Images || [])
+        .filter((image: string) => !payload?.deleteImages.includes(image))
+        .filter((image: string) => !restDbImages.includes(image));
+
+      payload.images = [...restDbImages, ...updatedPayloadImages];
+    }
+
+    const result = await Tour.findByIdAndUpdate(tourId, payload, {
       new: true,
     });
+
+    // delete images from cloudinary
+    if (payload.deleteImages && payload.deleteImages.length > 0) {
+      await Promise.all(payload.deleteImages.map((image: string) => deleteImageFromCloudinary(image)));
+    }
+
     sendResponse(res, 200, "Tour updated successfully", result);
   } catch (error) {
     next(error);
