@@ -8,7 +8,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     const picture = req.file?.path;
     const user = await UserService.createUser(req.body, picture);
     sendResponse(res, 200, "User created successfully", user);
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     next(error);
   }
@@ -25,7 +25,7 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
       newPicture
     );
     sendResponse(res, 200, "User updated successfully", user);
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     next(error);
   }

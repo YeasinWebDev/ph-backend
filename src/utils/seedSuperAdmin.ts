@@ -16,7 +16,7 @@ export const seedSuperAdmin = async () => {
     };
 
     if (!isSuperAdminExist) {
-      const superAdmin = await User.create({
+      await User.create({
         name: "Super Admin",
         email: envVars.SUPER_ADMIN_EMAIL,
         password: hashedPassword,
@@ -28,5 +28,7 @@ export const seedSuperAdmin = async () => {
     } else {
       console.log("super admin already exist");
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log(error,"from seedSuperAdmin");
+  }
 };

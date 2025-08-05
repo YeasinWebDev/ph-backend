@@ -1,6 +1,6 @@
 import { IAuthProvider, IsActive } from "./../user/user.interface";
 import { JwtPayload } from "jsonwebtoken";
-import { createNewAccessTokenByRefreshToken, createToken } from "../../../utils/userTokens";
+import { createNewAccessTokenByRefreshToken} from "../../../utils/userTokens";
 import { User } from "../user/user.model";
 import bcrypt from "bcryptjs";
 import AppError from "../../errorHelpers/AppError";
@@ -62,7 +62,7 @@ const changePassword = async (decoded: JwtPayload, newPassword: string, oldPassw
 const resetPassword = async (decoded: JwtPayload, newPassword: string,id:string) => {
 
   if(id !== decoded.userId){
-    throw new AppError("Tou can not reset password of another user",400);
+    throw new AppError("you can not reset password of another user",400);
   }
 
   const isUserExist = await User.findOne({ email: decoded.email });

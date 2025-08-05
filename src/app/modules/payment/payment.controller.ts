@@ -14,41 +14,39 @@ const initPayment = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const successPayment = async (req: Request, res: Response) => {
-  const result = await PaymentService.successPayment(
-    req.query as Record<string, string>
-  );
+  const result = await PaymentService.successPayment(req.query as Record<string, string>);
 
-  if (result.success)
-    return res.redirect(
-      `${envVars.SSL.SSL_SUCCESS_FRONTEND_URL}?transactionId=${req.query.transactionId}&amount=${req.query.amount}&status=success`
-    );
+  if (result.success) return res.redirect(`${envVars.SSL.SSL_SUCCESS_FRONTEND_URL}?transactionId=${req.query.transactionId}&amount=${req.query.amount}&status=success`);
 };
 
 const cancelPayment = async (req: Request, res: Response) => {
-  const result = await PaymentService.cancelPayment(
-    req.query as Record<string, string>
-  );
+  const result = await PaymentService.cancelPayment(req.query as Record<string, string>);
 
-  if (!result.success)
-    return res.redirect(
-      `${envVars.SSL.SSL_CANCEL_FRONTEND_URL}?transactionId=${req.query.transactionId}&amount=${req.query.amount}&status=canceled`
-    );
+  if (!result.success) return res.redirect(`${envVars.SSL.SSL_CANCEL_FRONTEND_URL}?transactionId=${req.query.transactionId}&amount=${req.query.amount}&status=canceled`);
 };
 
 const failPayment = async (req: Request, res: Response) => {
-  const result = await PaymentService.failPayment(
-    req.query as Record<string, string>
-  );
+  const result = await PaymentService.failPayment(req.query as Record<string, string>);
 
-  if (!result.success)
-    return res.redirect(
-      `${envVars.SSL.SSL_FAIL_FRONTEND_URL}?transactionId=${req.query.transactionId}&amount=${req.query.amount}&status=failed`
-    );
+  if (!result.success) return res.redirect(`${envVars.SSL.SSL_FAIL_FRONTEND_URL}?transactionId=${req.query.transactionId}&amount=${req.query.amount}&status=failed`);
 };
+
+const getInvoiceDownloadUrl = async (req: Request, res: Response) => {
+  const { paymentId } = req.params;
+  const result = await PaymentService.getInvoiceDownloadUrl(paymentId);
+  sendResponse(res, 200, "Invoice download url fetched successfully", result);
+}
+
+const validatePayment = async (req: Request, res: Response) => {
+  const result = await PaymentService.validatePayment(req.body);
+  sendResponse(res, 200, "Payment validated successfully", result);
+}
 
 export const PaymentController = {
   initPayment,
   successPayment,
   cancelPayment,
   failPayment,
+  getInvoiceDownloadUrl,
+  validatePayment
 };

@@ -10,7 +10,7 @@ export const handlerValidationError = (
 
   const errors = Object.values(err.errors);
 
-  errors.forEach((errorObject: any) =>
+  errors.forEach((errorObject) =>
     errorSources.push({
       path: errorObject.path,
       message: errorObject.message,

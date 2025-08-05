@@ -4,7 +4,7 @@ import { checkAuth } from "../../middlewares/checkAuth";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { Role } from "../user/user.interface";
 import { BookingController } from "./booking.controller";
-import { createBookingZodSchema, updateBookingStatusZodSchema } from "./booking.validation";
+import { createBookingZodSchema} from "./booking.validation";
 
 const bookingRouter = express.Router();
 
@@ -16,28 +16,28 @@ bookingRouter.post("/",
 );
 
 // api/v1/booking
-bookingRouter.get("/",
-    checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-    BookingController.getAllBookings
-);
+// bookingRouter.get("/",
+//     checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+//     BookingController.getAllBookings
+// );
 
-// api/v1/booking/my-bookings
-bookingRouter.get("/my-bookings",
-    checkAuth(...Object.values(Role)),
-    BookingController.getUserBookings
-);
+// // api/v1/booking/my-bookings
+// bookingRouter.get("/my-bookings",
+//     checkAuth(...Object.values(Role)),
+//     BookingController.getUserBookings
+// );
 
-// api/v1/booking/bookingId
-bookingRouter.get("/:bookingId",
-    checkAuth(...Object.values(Role)),
-    BookingController.getSingleBooking
-);
+// // api/v1/booking/bookingId
+// bookingRouter.get("/:bookingId",
+//     checkAuth(...Object.values(Role)),
+//     BookingController.getSingleBooking
+// );
 
-// api/v1/booking/bookingId/status
-bookingRouter.patch("/:bookingId/status",
-    checkAuth(...Object.values(Role)),
-    validateRequest(updateBookingStatusZodSchema),
-    BookingController.updateBookingStatus
-);
+// // api/v1/booking/bookingId/status
+// bookingRouter.patch("/:bookingId/status",
+//     checkAuth(...Object.values(Role)),
+//     validateRequest(updateBookingStatusZodSchema),
+//     BookingController.updateBookingStatus
+// );
 
 export const bookingRoutes = bookingRouter;

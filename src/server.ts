@@ -1,9 +1,9 @@
-import express from "express";
 import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
 import { envVars } from "./app/config/env";
 import { seedSuperAdmin } from "./utils/seedSuperAdmin";
+import { connectRedis } from "./app/config/redis.config";
 
 let server: Server;
 
@@ -54,7 +54,8 @@ process.on("uncaughtException", (error) => {
   }
 });
 
-(async()=>{
- await startServer()
- await seedSuperAdmin()
-})()
+(async () => {
+  await connectRedis();
+  await startServer();
+  await seedSuperAdmin();
+})();

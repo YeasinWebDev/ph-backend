@@ -1,4 +1,4 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+// import jwt, { JwtPayload } from "jsonwebtoken";
 import { Router } from "express";
 import { userController } from "./user.controller";
 import { validateRequest } from "../../middlewares/validateRequest";
@@ -29,7 +29,7 @@ UserRouters.get(
 
 UserRouters.get(
   '/:id',
-  checkAuth(...Object.values(Role)),
+  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
   userController.getUser
 )
 

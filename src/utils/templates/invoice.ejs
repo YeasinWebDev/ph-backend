@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Booking Invoice</title>
+  </head>
+  <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f9fafb; color: #111827">
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding: 20px">
+      <tr>
+        <td align="center">
+          <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); padding: 30px">
+            <tr>
+              <td style="text-align: center; padding-bottom: 20px">
+                <h1 style="margin: 0; color: #1f2937">Invoice for Booking</h1>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding: 10px 0">
+                <p style="margin: 5px 0"><strong>Transaction ID:</strong> <%= transactionId %></p>
+                <p style="margin: 5px 0"><strong>Booking Date:</strong> <%= new Date(bookingDate).toLocaleDateString() %></p>
+                <p style="margin: 5px 0"><strong>Customer:</strong> <%= userName %></p>
+                <p style="margin: 5px 0"><strong>Tour:</strong> <%= tourTitle %></p>
+                <p style="margin: 5px 0"><strong>Guests:</strong> <%= guestCount %></p>
+                <p style="margin: 5px 0"><strong>Amount Paid:</strong><%= totalAmount.toFixed(2) %></p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-top: 30px; text-align: center; font-size: 12px; color: #6b7280">
+                <p>For questions or support, reply to this email.</p>
+                <p>&copy; <%= new Date().getFullYear() %> Your Company Name. All rights reserved.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

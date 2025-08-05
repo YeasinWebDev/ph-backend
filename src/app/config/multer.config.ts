@@ -10,7 +10,7 @@ const stroage = new CloudinaryStorage({
         .toLocaleLowerCase()
         .replace(/\s+/g, "-")
         .replace(/\./g, "-")
-        .replace(/[^a-z0-9\-\.]/g, ""); // non alpha numeric - !@#$
+        .replace(/[^a-z0-9.-]/g, ""); // non alpha numeric - !@#$
 
       const uniqueFIleName =
         Math.random().toString(36).substring(2) +

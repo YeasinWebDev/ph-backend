@@ -4,6 +4,7 @@ import { PAYMENT_STATUS } from "../payment/payment.interface";
 import { Payment } from "../payment/payment.model";
 import { SSLService } from "../sslCommerz/sslCommerz.service";
 import { Tour } from "../tour/tour.model";
+import { IUser } from "../user/user.interface";
 import { User } from "../user/user.model";
 import { BOOKING_STATUS, IBooking } from "./booking.interfaces";
 import { Booking } from "./booking.model";
@@ -15,6 +16,9 @@ const createBooking = async (payload: Partial<IBooking>, userId: string) => {
 
   try {
     const user = await User.findById(userId);
+    if(user?.isVerified === false) {
+      throw new AppError("User is not verified", 400);
+    }
 
     if (!user?.phone || !user?.address) {
       throw new AppError("User phone and address is required", 400);
@@ -25,7 +29,8 @@ const createBooking = async (payload: Partial<IBooking>, userId: string) => {
     if (!tour?.costFrom) {
       throw new AppError("No Tour Cost Found!", 400);
     }
-    const amount = Number(tour.costFrom) * Number(payload.guestCount!);
+    const guestCount = payload.guestCount ?? 1; 
+    const amount = Number(tour.costFrom) * Number(guestCount);
 
     const booking = await Booking.create(
       [
@@ -61,28 +66,27 @@ const createBooking = async (payload: Partial<IBooking>, userId: string) => {
       .populate("tour", "title costFrom")
       .populate("payment");
 
-    const userAddress = (updateBooking?.user as any).address;
-    const userEmail = (updateBooking?.user as any).email;
-    const userPhoneNumber = (updateBooking?.user as any).phone;
-    const userName = (updateBooking?.user as any).name;
+    const userAddress = (updateBooking?.user as unknown as IUser).address;
+    const userEmail = (updateBooking?.user as unknown as IUser).email;
+    const userPhoneNumber = (updateBooking?.user as unknown as IUser).phone;
+    const userName = (updateBooking?.user as unknown as IUser).name;
 
     const sslPayload = {
-      address: userAddress,
-      email: userEmail,
-      phoneNumber: userPhoneNumber,
+      address: userAddress ?? "",
+      email: userEmail ?? "",
+      phoneNumber: userPhoneNumber ?? "",
       name: userName,
       amount: amount,
       transactionId: transactionId,
     };
 
     const sslCommerz = await SSLService.sslPaymentInit(sslPayload);
-    // console.log(sslCfommerz);
 
     await session.commitTransaction();
     await session.endSession();
     return {
       booking: updateBooking,
-      payment:sslCommerz.GatewayPageURL
+      payment: sslCommerz.GatewayPageURL,
     };
   } catch (error) {
     await session.abortTransaction();

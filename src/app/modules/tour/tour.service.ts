@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { Tour, TourType } from "./tour.model";
 import AppError from "../../errorHelpers/AppError";
 import { sendResponse } from "../../../utils/sendResponse";
-import { excludeFields, toursearchFields } from "./tour.constant";
+import { toursearchFields } from "./tour.constant";
 import { QueryBuilder } from "../../../utils/QueryBuilder";
 import { deleteImageFromCloudinary } from "../../config/cloudinary.config";
 
@@ -126,7 +126,17 @@ const createTour = async (req: Request, res: Response, next: NextFunction) => {
 
 const allTours = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const quaryBuilder = new QueryBuilder(Tour.find(), req.query);
+    const parsedQuery: Record<string, string> = Object.entries(req.query).reduce((acc, [key, value]) => {
+      if (typeof value === "string") {
+        acc[key] = value;
+      } else if (Array.isArray(value)) {
+        acc[key] = typeof value[0] === "string" ? value[0] : "";
+      } else {
+        acc[key] = "";
+      }
+      return acc;
+    }, {} as Record<string, string>);
+    const quaryBuilder = new QueryBuilder(Tour.find(), parsedQuery);
     const tours = await quaryBuilder.search(toursearchFields).filter().sort().fields().pagination().getResults();
 
     const meta = await quaryBuilder.getMeta();
@@ -142,7 +152,6 @@ const allTours = async (req: Request, res: Response, next: NextFunction) => {
 const updateTour = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const tourId = req.params.id;
-    const data = req.body;
 
     const isExist = await Tour.findById(tourId);
     if (!isExist) {
@@ -158,7 +167,7 @@ const updateTour = async (req: Request, res: Response, next: NextFunction) => {
     if (payload.image && payload.image.length > 0 && isExist.images && isExist.images.length > 0) {
       payload.images = [...isExist.images, ...payload.images];
     }
-    
+
     if (payload.deleteImages && payload.deleteImages.length > 0 && isExist.images && isExist.images.length > 0) {
       const restDbImages = isExist.images.filter((image) => !payload.deleteImages.includes(image));
 

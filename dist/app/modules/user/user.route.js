@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UserRouters = void 0;
+// import jwt, { JwtPayload } from "jsonwebtoken";
+const express_1 = require("express");
+const user_controller_1 = require("./user.controller");
+const validateRequest_1 = require("../../middlewares/validateRequest");
+const user_validation_1 = require("./user.validation");
+const checkAuth_1 = require("../../middlewares/checkAuth");
+const user_interface_1 = require("./user.interface");
+const multer_config_1 = require("../../config/multer.config");
+exports.UserRouters = (0, express_1.Router)();
+exports.UserRouters.post("/register", multer_config_1.malterUpload.single("file"), (0, validateRequest_1.validateRequest)(user_validation_1.createUserZodSchema), user_controller_1.userController.createUser);
+exports.UserRouters.get("/me", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), user_controller_1.userController.getMe);
+exports.UserRouters.get("/all", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.ADMIN), user_controller_1.userController.getAllUsers);
+exports.UserRouters.get('/:id', (0, checkAuth_1.checkAuth)(user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.ADMIN), user_controller_1.userController.getUser);
+exports.UserRouters.patch("/:id", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), multer_config_1.malterUpload.single("file"), (0, validateRequest_1.validateRequest)(user_validation_1.updateUserZodSchema), user_controller_1.userController.updateUser);

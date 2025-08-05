@@ -1,8 +1,6 @@
-import mongoose from "mongoose";
 import { TGenericErrorResponse } from "../app/interfaces/error.types";
 
 export const handleCastError = (
-  err: mongoose.Error.CastError
 ): TGenericErrorResponse => {
   return {
     statusCode: 400,

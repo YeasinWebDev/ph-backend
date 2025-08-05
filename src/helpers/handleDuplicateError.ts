@@ -1,9 +1,10 @@
 import { TGenericErrorResponse } from "../app/interfaces/error.types";
-export const handlerDuplicateError = (err: any): TGenericErrorResponse => {
+export const handlerDuplicateError = (err: { message: string }): TGenericErrorResponse => {
   const matchedArray = err.message.match(/"([^"]*)"/);
 
+  const duplicatedValue = matchedArray?.[1] || "Field";
   return {
     statusCode: 400,
-    message: `${matchedArray[1]} already exists!!`,
+    message: `${duplicatedValue} already exists!!`,
   };
 };

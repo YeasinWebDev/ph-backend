@@ -18,7 +18,7 @@ interface SendMailOptions {
   to: string;
   subject: string;
   templateName: string;
-  templateData?: any;
+  templateData?: Record<string, unknown>;
   attachments?: {
     filename: string;
     content: Buffer | string;
@@ -43,7 +43,7 @@ export const sendEmail = async ({ to, subject, templateName, templateData, attac
     });
 
     console.log(`\u2709\uFE0F Email sent to ${to}: ${info?.messageId}`);
-  } catch (error: any) {
+  } catch (error) {
     console.log("error", error);
     throw new AppError("Email error", 400);
   }

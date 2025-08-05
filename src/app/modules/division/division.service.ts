@@ -24,7 +24,17 @@ const createDevision = async (req: Request, res: Response, next: NextFunction) =
 
 const getAllDevision = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const quaryBuilder = new QueryBuilder(Division.find(), req.query);
+    const parsedQuery: Record<string, string> = Object.entries(req.query).reduce((acc, [key, value]) => {
+      if (typeof value === "string") {
+        acc[key] = value;
+      } else if (Array.isArray(value)) {
+        acc[key] = typeof value[0] === "string" ? value[0] : "";
+      } else {
+        acc[key] = "";
+      }
+      return acc;
+    }, {} as Record<string, string>);
+    const quaryBuilder = new QueryBuilder(Division.find(), parsedQuery);
     const divisions = await quaryBuilder.search([]).filter().sort().fields().pagination().getResults();
 
     const meta = await quaryBuilder.getMeta();

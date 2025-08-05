@@ -1,0 +1,21 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.tourRouter = void 0;
+const express_1 = require("express");
+const tour_controler_1 = require("./tour.controler");
+const checkAuth_1 = require("../../middlewares/checkAuth");
+const user_interface_1 = require("../user/user.interface");
+const validateRequest_1 = require("../../middlewares/validateRequest");
+const tour_validation_1 = require("./tour.validation");
+const multer_config_1 = require("../../config/multer.config");
+exports.tourRouter = (0, express_1.Router)();
+exports.tourRouter.post("/create-tour-type", (0, validateRequest_1.validateRequest)(tour_validation_1.createTourTypeZodSchema), (0, checkAuth_1.checkAuth)(user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.ADMIN), tour_controler_1.TourController.createTourType);
+exports.tourRouter.get("/tour-types", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.ADMIN), tour_controler_1.TourController.allToursType);
+exports.tourRouter.patch("/tour-types/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.ADMIN), (0, validateRequest_1.validateRequest)(tour_validation_1.updateTourTypeZodSchema), tour_controler_1.TourController.updateToursType);
+exports.tourRouter.delete("/tour-types/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.ADMIN), tour_controler_1.TourController.deleteToursType);
+// tour
+exports.tourRouter.post("/create", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.ADMIN), multer_config_1.malterUpload.array("files"), (0, validateRequest_1.validateRequest)(tour_validation_1.createTourSchema), tour_controler_1.TourController.createTour);
+exports.tourRouter.get("/", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.ADMIN), tour_controler_1.TourController.allTours);
+exports.tourRouter.patch("/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.ADMIN), multer_config_1.malterUpload.array("files"), (0, validateRequest_1.validateRequest)(tour_validation_1.updateTourSchema), tour_controler_1.TourController.updateTour);
+exports.tourRouter.get("/:slug", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.ADMIN), tour_controler_1.TourController.getSingleTour);
+exports.tourRouter.delete("/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.ADMIN), tour_controler_1.TourController.deleteTour);

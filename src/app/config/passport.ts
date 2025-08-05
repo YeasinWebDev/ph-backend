@@ -3,9 +3,9 @@ import { Strategy as GoogleStrategy, Profile, VerifyCallback } from "passport-go
 import { Strategy as LocalStrategy } from "passport-local";
 import { envVars } from "./env";
 import { User } from "../modules/user/user.model";
-import { IsActive, Role } from "../modules/user/user.interface";
+import { IsActive, IUser, Role } from "../modules/user/user.interface";
 import bcrypt from "bcryptjs";
-import AppError from "../errorHelpers/AppError";
+import { CallbackError } from "mongoose";
 
 passport.use(
   new LocalStrategy(
@@ -91,13 +91,13 @@ passport.use(
   )
 );
 
-passport.serializeUser((user: any, done: (err: any, id?: unknown) => void) => done(null, user._id));
+passport.serializeUser((user: Partial<IUser>, done: (err: CallbackError, id?: unknown) => void) => done(null, user._id));
 
-passport.deserializeUser(async (id: string, done: (err: any, user?: any) => void) => {
+passport.deserializeUser(async (id: string, done: (err: CallbackError|null, user?: Partial<IUser>|null) => void) => {
   try {
     const user = await User.findById(id);
     return done(null, user);
   } catch (error) {
-    return done(error);
+    return done(error as CallbackError);
   }
 });

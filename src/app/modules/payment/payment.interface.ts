@@ -12,7 +12,7 @@ export interface IPayment {
   booking: Types.ObjectId;
   transactionId: string;
   amount: number;
-  paymentGatewayData?: any;
+  paymentGatewayData?: unknown;
   invoiceUrl?: string;
   status: PAYMENT_STATUS;
 }

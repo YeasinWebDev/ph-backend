@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.paymentRoute = void 0;
+const express_1 = require("express");
+const payment_controller_1 = require("./payment.controller");
+const checkAuth_1 = require("../../middlewares/checkAuth");
+const user_interface_1 = require("../user/user.interface");
+exports.paymentRoute = (0, express_1.Router)();
+exports.paymentRoute.post("/init-payment/:bookingId", payment_controller_1.PaymentController.initPayment);
+exports.paymentRoute.post("/success", payment_controller_1.PaymentController.successPayment);
+exports.paymentRoute.post("/cancel", payment_controller_1.PaymentController.cancelPayment);
+exports.paymentRoute.post("/fail", payment_controller_1.PaymentController.failPayment);
+exports.paymentRoute.get("/invoice/:paymentId", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), payment_controller_1.PaymentController.getInvoiceDownloadUrl);
+exports.paymentRoute.post("/validate-payment", payment_controller_1.PaymentController.validatePayment);
