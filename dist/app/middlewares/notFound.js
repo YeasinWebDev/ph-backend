@@ -4,7 +4,7 @@ exports.notFound = void 0;
 const notFound = (req, res) => {
     res.status(404).json({
         success: false,
-        message: "Not Found",
+        message: "Route Not Found",
     });
 };
 exports.notFound = notFound;

@@ -15,6 +15,7 @@ import { bookingRoutes } from "./app/modules/booking/booking.route";
 import { paymentRoute } from "./app/modules/payment/payment.route";
 import { otpRouter } from "./app/modules/otp/otp.route";
 import { statsRouter } from "./app/modules/stats/stats.route";
+import { guideRoutes } from "./app/modules/guide/guide.route";
 
 const app = express();
 
@@ -48,6 +49,9 @@ app.use("/api/v1/booking", bookingRoutes)
 app.use("/api/v1/payment", paymentRoute)
 app.use("/api/v1/otp",otpRouter)
 app.use("/api/v1/stats",statsRouter)
+app.use("/api/v1/guide",guideRoutes)
+
+
 app.use(globalErrorHandler);
 
 app.use(notFound)

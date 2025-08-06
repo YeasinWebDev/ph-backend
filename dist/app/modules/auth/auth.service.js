@@ -58,7 +58,7 @@ const changePassword = (decoded, newPassword, oldPassword) => __awaiter(void 0, 
 });
 const resetPassword = (decoded, newPassword, id) => __awaiter(void 0, void 0, void 0, function* () {
     if (id !== decoded.userId) {
-        throw new AppError_1.default("Tou can not reset password of another user", 400);
+        throw new AppError_1.default("you can not reset password of another user", 400);
     }
     const isUserExist = yield user_model_1.User.findOne({ email: decoded.email });
     if (!isUserExist) {

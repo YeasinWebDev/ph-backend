@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import AppError from "../errorHelpers/AppError";
 import { TErrorSources } from "../interfaces/error.types";
 import { handlerDuplicateError } from "../../helpers/handleDuplicateError";
@@ -9,7 +9,8 @@ import { deleteImageFromCloudinary } from "../config/cloudinary.config";
 import mongoose from "mongoose";
 import { ZodError } from "zod";
 
-export const globalErrorHandler = async (err: { name?: string; code?: number; stack?: string; message?: string; statusCode?: number }, req: Request, res: Response) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const globalErrorHandler = async (err: { name?: string; code?: number; stack?: string; message?: string; statusCode?: number }, req: Request, res: Response, _next:NextFunction) => {
   let errorSources: TErrorSources[] = [];
   let statusCode = 500;
   let message = "Something Went Wrong!!";

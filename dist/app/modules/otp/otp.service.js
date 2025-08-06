@@ -18,7 +18,7 @@ const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 const user_model_1 = require("../user/user.model");
 const redis_config_1 = require("../../config/redis.config");
 const sendEmail_1 = require("../../../utils/sendEmail");
-const OTP_EXPIRATION = 2 * 60; // 2minute
+const OTP_EXPIRATION = 5 * 60; // 5minute
 const generateOtp = (length = 6) => {
     const otp = crypto_1.default.randomInt(10 ** (length - 1), 10 ** length).toString();
     return otp;

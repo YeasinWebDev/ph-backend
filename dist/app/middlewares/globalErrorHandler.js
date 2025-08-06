@@ -19,7 +19,8 @@ const handleCastError_1 = require("../../helpers/handleCastError");
 const handlerValidationError_1 = require("../../helpers/handlerValidationError");
 const handleZodError_1 = require("../../helpers/handleZodError");
 const cloudinary_config_1 = require("../config/cloudinary.config");
-const globalErrorHandler = (err, req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const globalErrorHandler = (err, req, res, _next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d;
     let errorSources = [];
     let statusCode = 500;

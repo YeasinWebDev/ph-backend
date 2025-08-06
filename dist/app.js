@@ -20,6 +20,7 @@ const booking_route_1 = require("./app/modules/booking/booking.route");
 const payment_route_1 = require("./app/modules/payment/payment.route");
 const otp_route_1 = require("./app/modules/otp/otp.route");
 const stats_route_1 = require("./app/modules/stats/stats.route");
+const guide_route_1 = require("./app/modules/guide/guide.route");
 const app = (0, express_1.default)();
 app.use((0, express_session_1.default)({
     secret: env_1.envVars.EXPRESS_SESSION_SECRET,
@@ -49,6 +50,7 @@ app.use("/api/v1/booking", booking_route_1.bookingRoutes);
 app.use("/api/v1/payment", payment_route_1.paymentRoute);
 app.use("/api/v1/otp", otp_route_1.otpRouter);
 app.use("/api/v1/stats", stats_route_1.statsRouter);
+app.use("/api/v1/guide", guide_route_1.guideRoutes);
 app.use(globalErrorHandler_1.globalErrorHandler);
 app.use(notFound_1.notFound);
 exports.default = app;
