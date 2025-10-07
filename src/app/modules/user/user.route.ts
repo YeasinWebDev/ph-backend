@@ -37,6 +37,5 @@ UserRouters.patch(
   "/:id",
   checkAuth(...Object.values(Role)),
   malterUpload.single("file"),
-  validateRequest(updateUserZodSchema),
   userController.updateUser
 );

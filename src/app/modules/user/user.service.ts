@@ -15,8 +15,8 @@ const createUser = async (payload: Partial<IUser>, picture?: string) => {
   }
 
   if (!payload?.password) {
-  throw new AppError("Password is required", 400);
-}
+    throw new AppError("Password is required", 400);
+  }
 
   const hashPassword = await bcrypt.hash(payload.password, 10);
 
@@ -39,7 +39,7 @@ const createUser = async (payload: Partial<IUser>, picture?: string) => {
 
 const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken: JwtPayload, picture?: string) => {
   if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
-    if (userId !== decodedToken.userId) {
+    if (userId !== decodedToken?.userId) {
       throw new AppError("You are not authorized", 401);
     }
   }
@@ -50,19 +50,19 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
     throw new Error("User not found");
   }
 
-  if (decodedToken.role === Role.SUPER_ADMIN && isUserExist.role === Role.SUPER_ADMIN) {
-    throw new AppError("You are not authorized", 401);
-  }
+  // if (decodedToken.role === Role.SUPER_ADMIN && isUserExist.role === Role.SUPER_ADMIN) {
+  //   throw new AppError("You are not authorized", 401);
+  // }
 
   if (payload.role) {
     if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
-      throw new Error("You are not authorized");
+      throw new AppError("You are not authorized", 401);
     }
   }
 
   if (payload.isActive || payload.isDeleted || payload.isVerified) {
     if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
-      throw new Error("You are not authorized");
+      throw new AppError("You are not authorized", 401);
     }
   }
   const newUpdatedUser = await User.findByIdAndUpdate(

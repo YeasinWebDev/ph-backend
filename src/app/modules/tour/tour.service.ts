@@ -63,6 +63,10 @@ const deleteToursType = async (req: Request, res: Response, next: NextFunction) 
 
 const createTour = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    if (!req.body.name) {
+      return res.status(400).json({ message: "Tour name is required" });
+    }
+
     const slug = req.body.name.toLowerCase().split(" ").join("-");
     req.body.slug = slug;
 

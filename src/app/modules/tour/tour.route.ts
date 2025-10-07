@@ -17,7 +17,6 @@ tourRouter.post(
 
 tourRouter.get(
   "/tour-types",
-  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
   TourController.allToursType
 );
 
@@ -46,7 +45,6 @@ tourRouter.post(
 
 tourRouter.get(
   "/",
-  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
   TourController.allTours
 );
 
@@ -60,7 +58,6 @@ tourRouter.patch(
 
 tourRouter.get(
   "/:slug",
-  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
   TourController.getSingleTour
 );
 

@@ -18,7 +18,7 @@ const user_model_1 = require("../modules/user/user.model");
 const AppError_1 = __importDefault(require("../errorHelpers/AppError"));
 const user_interface_1 = require("../modules/user/user.interface");
 const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const accessToken = req.headers.authorization;
+    const accessToken = req.headers.authorization || req.cookies.accessToken;
     try {
         const decoded = (0, jwt_1.verifyToken)(accessToken, "yeasin");
         const isUserExist = yield user_model_1.User.findOne({ email: decoded.email });

@@ -15,8 +15,10 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+  console.log(req.body)
   try {
     const verify = req.user as JwtPayload;
+    console.log(verify)
     const newPicture = req.file?.path;
     const user = await UserService.updateUser(
       req.params.id,
@@ -24,7 +26,7 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
       verify,
       newPicture
     );
-    sendResponse(res, 200, "User updated successfully", user);
+    sendResponse(res, 200, "User updated successfully", user);  
   } catch (error) {
     console.log(error);
     next(error);

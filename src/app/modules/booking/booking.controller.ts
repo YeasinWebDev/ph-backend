@@ -13,6 +13,7 @@ const createBooking = async (req: Request, res: Response, next: NextFunction) =>
   );
   sendResponse(res, 201, "Booking created successfully", booking);
   } catch (error) {
+    console.log(error,"error")
     next(error)
   }
 };

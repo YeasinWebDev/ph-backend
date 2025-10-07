@@ -6,6 +6,7 @@ import { User } from "../modules/user/user.model";
 import { IsActive, IUser, Role } from "../modules/user/user.interface";
 import bcrypt from "bcryptjs";
 import { CallbackError } from "mongoose";
+import { Request } from "express";
 
 passport.use(
   new LocalStrategy(
@@ -81,7 +82,6 @@ passport.use(
             ],
           });
         }
-
         return done(null, user);
       } catch (error) {
         console.log(error, "Google Strategy Error");

@@ -39,10 +39,13 @@ const creadentialsLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, 
             if (!user) {
                 return next(new Error(info.message));
             }
+            if (!user.isVerified) {
+                return next(new Error("User is not verified"));
+            }
             // const jwtpayload = {userId:user._id,email:user.email,role:user.role}
             const tokenInfo = (0, userTokens_1.createToken)(user);
-            res.cookie("accessToken", tokenInfo.accessToken, { httpOnly: true, secure: env_1.envVars.NODE_ENV === "production" ? true : false, sameSite: 'none' });
-            res.cookie("refreshToken", tokenInfo.refreshToken, { httpOnly: true, secure: env_1.envVars.NODE_ENV === "production" ? true : false, sameSite: 'none' });
+            res.cookie("accessToken", tokenInfo.accessToken, { httpOnly: true, secure: true, sameSite: 'none' });
+            res.cookie("refreshToken", tokenInfo.refreshToken, { httpOnly: true, secure: true, sameSite: 'none' });
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const _a = user.toObject(), { password } = _a, rest = __rest(_a, ["password"]);
             (0, sendResponse_1.sendResponse)(res, 200, "Login Successfully", Object.assign(Object.assign({}, tokenInfo), { user: rest }));
@@ -59,7 +62,7 @@ const getNewAccessToken = (req, res, next) => __awaiter(void 0, void 0, void 0, 
             throw new Error("Refresh Token Not Found");
         }
         const tokenInfo = yield auth_service_1.authServices.getNewAccessToken(refreshToken);
-        res.cookie("accessToken", tokenInfo.accessToken, { httpOnly: true, secure: env_1.envVars.NODE_ENV === "production" ? true : false, sameSite: 'none' });
+        res.cookie("accessToken", tokenInfo.accessToken, { httpOnly: true, secure: true, sameSite: 'none' });
         (0, sendResponse_1.sendResponse)(res, 200, "Get New Access Token", tokenInfo);
     }
     catch (error) {
@@ -70,12 +73,12 @@ const logout = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
     try {
         res.clearCookie("accessToken", {
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: "lax",
         });
         res.clearCookie("refreshToken", {
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: "lax",
         });
         (0, sendResponse_1.sendResponse)(res, 200, "Logout Successfully", {});
@@ -138,8 +141,8 @@ const googleCallback = (req, res) => __awaiter(void 0, void 0, void 0, function*
         throw new Error("User Not Found");
     }
     const tokenInfo = (0, userTokens_1.createToken)(user);
-    res.cookie("accessToken", tokenInfo.accessToken, { httpOnly: true, secure: env_1.envVars.NODE_ENV === "production" ? true : false, sameSite: 'none' });
-    res.cookie("refreshToken", tokenInfo.refreshToken, { httpOnly: true, secure: env_1.envVars.NODE_ENV === "production" ? true : false, sameSite: 'none' });
+    res.cookie("accessToken", tokenInfo.accessToken, { httpOnly: true, secure: true, sameSite: 'none' });
+    res.cookie("refreshToken", tokenInfo.refreshToken, { httpOnly: true, secure: true, sameSite: 'none' });
     res.redirect(`${env_1.envVars.FRONTEND_URL}/${redirecTo}`);
 });
 exports.authControllers = {
