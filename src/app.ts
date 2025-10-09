@@ -52,8 +52,8 @@ app.use("/api/v1/stats",statsRouter)
 app.use("/api/v1/guide",guideRoutes)
 
 
-app.use(globalErrorHandler);
 
 app.use(notFound)
+app.use(globalErrorHandler);
 
 export default app;
